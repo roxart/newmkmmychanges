@@ -122,6 +122,8 @@ namespace MKMTool
             }
 
             s.priceMinRarePrice = Decimal.ToDouble(numericUpDownPriceEstMinPrice.Value);
+            s.priceMinPriceRest = Decimal.ToDouble(numericUpDownPriceEstMinPriceRest.Value);
+            s.priceMinPriceFoils = Decimal.ToDouble(numericUpDownPriceEstMinPriceFoils.Value);
             s.priceMinSimilarItems = Decimal.ToInt32(numericUpDownPriceEstMinN.Value);
             s.priceMaxSimilarItems = Decimal.ToInt32(numericUpDownPriceEstMaxN.Value);
             if (radioButtonPriceEstPriceByAvg.Checked)

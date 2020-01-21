@@ -67,6 +67,8 @@ namespace MKMTool
         // each pair is a <max price of item; max difference in % allowed for such the next item> to be considered as similar - used to cull outliers
         public SortedList<double, double> priceMaxDifferenceLimits;
         public double priceMinRarePrice;
+        public double priceMinPriceRest;
+        public double priceMinPriceFoils;
         public int priceMinSimilarItems, priceMaxSimilarItems;
         public PriceSetMethod priceSetPriceBy;
         // if price computed based on average, priceFactor = 0.5 will set price as average of similar items, at 0
@@ -186,6 +188,12 @@ namespace MKMTool
                     case "priceMinRarePrice":
                         temp.priceMinRarePrice = double.Parse(att.Value, CultureInfo.InvariantCulture);
                         break;
+                    case "priceMinPriceRest":
+                        temp.priceMinPriceRest = double.Parse(att.Value, CultureInfo.InvariantCulture);
+                        break;
+                    case "priceMinPriceFoils":
+                        temp.priceMinPriceFoils = double.Parse(att.Value, CultureInfo.InvariantCulture);
+                        break;
                     case "priceMinSimilarItems":
                         temp.priceMinSimilarItems = int.Parse(att.Value, CultureInfo.InvariantCulture);
                         break;
@@ -276,6 +284,8 @@ namespace MKMTool
             root.AppendChild(child);
 
             root.SetAttribute("priceMinRarePrice", priceMinRarePrice.ToString("f2", CultureInfo.InvariantCulture));
+            root.SetAttribute("priceMinPriceRest", priceMinPriceRest.ToString("f2", CultureInfo.InvariantCulture));
+            root.SetAttribute("priceMinPriceFoils", priceMinPriceFoils.ToString("f2", CultureInfo.InvariantCulture));
             root.SetAttribute("priceMinSimilarItems", priceMinSimilarItems.ToString(CultureInfo.InvariantCulture));
             root.SetAttribute("priceMaxSimilarItems", priceMaxSimilarItems.ToString(CultureInfo.InvariantCulture));
             root.SetAttribute("priceSetPriceBy", priceSetPriceBy.ToString());
@@ -332,7 +342,9 @@ namespace MKMTool
             s.priceMaxChangeLimits.Clear(); // empty by default
             s.priceMaxDifferenceLimits.Clear(); // empty by default
 
-            s.priceMinRarePrice = 0.05;
+            s.priceMinRarePrice = 0.30;
+            s.priceMinPriceRest = 0.15;
+            s.priceMinPriceFoils = 1.00;
             s.priceMinSimilarItems = 4; // require exactly 4 items
             s.priceMaxSimilarItems = 4;
             s.priceSetPriceBy = PriceSetMethod.ByAverage;
@@ -770,9 +782,13 @@ namespace MKMTool
             priceEstimation += markupValue;
 
             string articleRarity = article.GetAttribute(MCAttribute.Rarity);
+            string articleFoil = article.GetAttribute(MCAttribute.Foil);
+            if (priceEstimation < settings.priceMinPriceRest) priceEstimation = settings.priceMinPriceRest;
             if (priceEstimation < settings.priceMinRarePrice
                 && (articleRarity == "Rare" || articleRarity == "Mythic"))
                 priceEstimation = settings.priceMinRarePrice;
+
+            if (articleFoil == "true" && priceEstimation < settings.priceMinPriceFoils) priceEstimation = settings.priceMinPriceFoils;
 
             // check the estimation is OK
             double dOldPrice = Convert.ToDouble(articlePrice, CultureInfo.InvariantCulture);
