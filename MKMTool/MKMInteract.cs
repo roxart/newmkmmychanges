@@ -417,7 +417,7 @@ namespace MKMTool
             //added rocky
             public static XmlDocument getOrders()
             {
-                return makeRequest("https://www.cardmarket.com/ws/v2.0/orders/seller/paid", "GET");
+                return makeRequest("https://api.cardmarket.com/ws/v2.0/orders/seller/paid", "GET");
             }
         }
     }
